@@ -1,0 +1,119 @@
+{javascripts file='assets/js/libs/underscore-min.js'}
+    <script src="{$asset_url}"></script>
+{/javascripts}
+
+<script>
+    console.log('test_on');
+    var config = {
+        'urlAdd': '{url path="/admin/module/CategoryBanner/category/save"}',
+        'urlDelete': '{url path="/admin/module/CategoryBanner/category/delete"}',
+        'urlSave': '{url path="/admin/module/CategoryBanner/category/save"}'
+    };
+
+    $(document).ready(function() {
+        // Price slice
+        var tpl = _.template($("#tpl-slice").html());
+
+        var showMessage = function showMessage(message) {
+            $('#category_banner_dialog')
+                .find('.modal-body')
+                .html(message)
+                .end()
+                .modal("show");
+        };
+
+        var getSliceData = function getSliceData($slice) {
+            var data = {
+                id: $slice.data("id"),
+                banner: $slice.find(".js-slice-banner").first().val(),
+                position: $slice.find(".js-slice-position").first().val(),
+                size: $slice.find(".js-slice-size").first().val(),
+                category:{$category_id|default:null}
+            };
+
+            return data;
+        };
+
+        // add new slice
+        $('.js-slice-add').on('click', function(){
+            var $slice = $(this).parents('tr').first();
+            var data = getSliceData($slice);
+
+            $.ajax({
+                type: "POST",
+                dataType: 'json',
+                data: data,
+                url: config.urlAdd
+            }).done(function(data, textStatus, jqXHR){
+                var sliceHtml = '';
+                if (data.success) {
+
+                    $slice.find('input').val('');
+
+                    sliceHtml = tpl(data.banner);
+
+                    $(sliceHtml).insertBefore($slice);
+                    let bannerSelect = $('#banner-select-'+data.banner.id);
+                    let sizeSelect = $('#size-select-'+data.banner.id);
+                    bannerSelect.val(data.banner.bannerId);
+                    sizeSelect.val(data.banner.size);
+                } else {
+                    showMessage(data.message.join('<br>'));
+                }
+            }).fail(function(jqXHR, textStatus, errorThrown){
+                console.log(jqXHR);
+                showMessage(jqXHR.responseText);
+            });
+        });
+
+        // save new slice
+        $('.slices').on('click', '.js-slice-save', function(){
+            var $slice = $(this).parents('tr').first();
+            var data = getSliceData($slice);
+
+            $.ajax({
+                type: "POST",
+                dataType: 'json',
+                data: data,
+                url: config.urlAdd
+            }).done(function(data, textStatus, jqXHR){
+                if (!data.success) {
+                    showMessage(data.message.join('<br>'));
+                } else {
+                    $slice.find('.js-slice-save').removeClass('btn-success');
+                }
+            }).fail(function(jqXHR, textStatus, errorThrown){
+                console.log(jqXHR);
+                showMessage(jqXHR.responseText);
+            });
+        });
+
+        $('.slices').on('change', '.js-slice input', function() {
+            $(this).parents('tr').first().find('.js-slice-save').addClass('btn-success');
+        });
+
+        // delete new slice
+        $('.slices').on('click', '.js-slice-delete', function(){
+            var $slice = $(this).parents('tr').first();
+            var data = getSliceData($slice);
+
+            $.ajax({
+                type: "POST",
+                dataType: 'json',
+                data: data,
+                url: config.urlDelete
+            }).done(function(data, textStatus, jqXHR){
+                if (data.success) {
+                    $slice.remove();
+                } else {
+                    showMessage(data.message);
+                }
+            }).fail(function(jqXHR, textStatus, errorThrown){
+                console.log(jqXHR);
+                showMessage(jqXHR.responseText);
+            });
+        });
+
+    });
+
+</script>

@@ -1,0 +1,114 @@
+{default_translation_domain domain='categorybanner.bo.default'}
+<div class="slices form-container">
+    <div class="col-md-12">
+        <div class="table-responsive">
+            <table class="table table-striped table-condensed table-left-aligned">
+                <thead>
+                <tr>
+                    <th class="col-md-4">{intl l="Bannière"}</th>
+                    <th class="col-md-4">{intl l="Position" }</th>
+                    <th class="col-md-3">{intl l="Taille"}</th>
+                    <th class="col-md-1">{intl l="Actions"}</th>
+                </tr>
+                </thead>
+                <tbody>
+                {loop name="banner_category_list" type="category_banner_loop" category_id=$category_id}
+                    <tr class="js-slice" data-id="{$ID}" >
+                        <th class="col-md-4">
+                            <select data-field="banner" class="form-control js-slice-banner" data-old="{$BANNER_ID}">
+                                <option value="">-- {intl l="Sélectionner une bannière"} --</option>
+                                {loop name="banner_list" type="banner_loop" lang_id=$lang_id}
+                                    <option value="{$ID}" {if $BANNER_ID == $ID}selected{/if} >{$ID}-{$TITLE}</option>
+                                {/loop}
+                            </select>
+                        </th>
+                        <th class="col-md-4">
+                            <input type="number" data-field="position" class="form-control js-slice-position" value="{$BANNER_POSITION}" data-old="{$BANNER_POSITION}" />
+                        </th>
+                        <th class="col-md-3">
+                            <select data-field="size" class="form-control js-slice-size">
+                                <option value="1" {if $BANNER_SIZE == 1}selected{/if}>1</option>
+                                <option value="2" {if $BANNER_SIZE == 2}selected{/if}>2</option>
+                            </select>
+                        </th>
+                        <th class="col-md-1">
+                            <div class="btn-group">
+                                    <a class="btn btn-default btn-xs js-slice-save" title="{intl l='Save this banner'}">
+                                        <span class="glyphicon glyphicon-floppy-disk"></span>
+                                    </a>
+
+                                    <a class="btn btn-default btn-xs js-slice-delete" title="{intl l='Delete this banner'}" data-id="{$ID}">
+                                        <span class="glyphicon glyphicon-trash"></span>
+                                    </a>
+                            </div>
+                        </th>
+                    </tr>
+                {/loop}
+
+
+                    <tr class="js-slice-new" data-id="0">
+                        {form name='categorybanner_form_banner_category_form'}
+                        <th class="col-md-4">
+                            <select data-field="banner" class="form-control js-slice-banner">
+                                <option value="">-- {intl l="Sélectionner une bannière"} --</option>
+                                {loop name="banner_list" type="banner_loop" lang_id=$lang_id}
+                                    <option value="{$ID}" >{$ID}-{$TITLE}</option>
+                                {/loop}
+                            </select>
+                        </th>
+                        <th class="col-md-4">
+                            <input type="number" data-field="position" class="form-control js-slice-position" value=""/>
+                        </th>
+                        <th class="col-md-3">
+                            <select data-field="size" class="form-control js-slice-size">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                            </select>
+                        </th>
+                        <th class="col-md-1">
+                            <a class="btn btn-default btn-xs js-slice-add" title="{intl l='Add this banner'}" >
+                                <span class="glyphicon glyphicon-plus"></span>
+                            </a>
+                        </th>
+                        {/form}
+                    </tr>
+                </tbody>
+            </table>
+
+            <script id="tpl-slice" type="text/html">
+                <tr class="js-slice" data-id="<%=id %>">
+                    <th class="col-md-4">
+                        <select data-field="banner" class="form-control js-slice-banner" id="banner-select-<%=id %>" data-old="<%=bannerId %>">
+                            <option value="">-- {intl l="Sélectionner une bannière"} --</option>
+                            {loop name="banner_list" type="banner_loop" lang_id=$lang_id}
+                                <option value="{$ID}">{$ID}-{$TITLE}</option>
+                            {/loop}
+                        </select>
+                    </th>
+                    <th class="col-md-4">
+                        <input type="number" data-field="position" class="form-control js-slice-position" value="<%=position %>" data-old="<%=position %>" />
+                    </th>
+                    <th class="col-md-3">
+                        <select data-field="size" class="form-control js-slice-size"  id="size-select-<%=id %>" data-old="<%=size %>">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                        </select>
+                    </th>
+                    <th class="col-md-1">
+                        <div class="btn-group">
+                            <a class="btn btn-default btn-xs js-slice-save" title="{intl l='Save this banner'}">
+                                <span class="glyphicon glyphicon-floppy-disk"></span>
+                            </a>
+
+                            <a class="btn btn-default btn-xs js-slice-delete" title="{intl l='Delete this banner'}" data-id="{$ID}">
+                                <span class="glyphicon glyphicon-trash"></span>
+                            </a>
+                        </div>
+                    </th>
+                </tr>
+            </script>
+
+        </div>
+    </div>
+</div>
+

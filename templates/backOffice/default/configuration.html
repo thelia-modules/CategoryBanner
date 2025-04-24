@@ -1,0 +1,151 @@
+
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="general-block-decorator">
+            <div class="table-responsive">
+                <table class="table table-striped table-condensed" id="banner_list">
+                    <caption>
+
+                       {intl l="Bannières des catégories"}
+
+                        {include file='renderer/buttons.html' btn_group=false buttons=[
+                        [
+                        'type' => 'create',
+                        'class' => 'action-btn',
+                        'title' => {intl l='Ajouter une nouvelle bannières'},
+                        'href' => '#banner_creation_dialog',
+                        'auth' => ['resource' => 'category-banner'],
+                        'data' => [
+                        'toggle' => 'modal'
+                        ]
+                        ]
+                        ]}
+                    </caption>
+
+                    {ifloop rel="banner_list"}
+                        <thead>
+                        <tr>
+                            <th class="object-title">
+                                {intl l='ID'}
+                            </th>
+
+                            <th class="object-image">&nbsp;</th>
+
+                            <th class="object-title">
+                                {intl l='Titre'}
+                            </th>
+
+                            <th class="actions">{intl l='Actions'}</th>
+                        </tr>
+                        </thead>
+
+                        <tbody>
+                        {loop name="banner_list" type="banner_loop" width="50" height="50" resize_mode="crop" lang_id={lang attr="id"}}
+                            <tr>
+                                <td>{$ID}</td>
+
+                                <td>
+                                    <a title="{intl l='Edit this banner'}"><img class="img-thumbnail" src="{$IMAGE_URL nofilter}" alt="{$TITLE}" /></a>
+                                </td>
+
+                                <td class="object-title">
+                                    <a href="{url path="/admin/module/CategoryBanner/banner/%id" id=$ID}" title="{intl l='Edit this banner'}">
+                                        {$TITLE}
+                                    </a>
+                                </td>
+
+                                <td class="actions">
+                                    {include file='renderer/buttons.html' buttons=[
+                                    [
+                                    'type' => 'edit',
+                                    'title' => {intl l='Edit this banner'},
+                                    'href' => {url path="/admin/module/CategoryBanner/banner/%id" id=$ID},
+                                    'auth' => ['resource' => 'admin.categorybanner']
+                                    ],
+                                    [
+                                    'type' => 'delete',
+                                    'class' => 'banner-delete',
+                                    'title' => {intl l='Delete this banner'},
+                                    'href' => '#banner_delete_dialog',
+                                    'data' => [
+                                    'id' => $ID,
+                                    'toggle' => 'modal'
+                                    ],
+                                    'auth' => ['resource' => 'admin.categorybanner']
+                                    ]
+                                    ]}
+                                </td>
+                            </tr>
+                        {/loop}
+                        </tbody>
+                    {/ifloop}
+
+                    {elseloop rel="banner_list"}
+                        <thead>
+                        <tr>
+                            <td class="message">
+                                <div class="alert alert-info">
+
+                                    {intl l="There is no banner. To create a new one, click the + button above."}
+
+                                </div>
+                            </td>
+                        </tr>
+                        </thead>
+                    {/elseloop}
+                </table>
+                    </caption>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{form name="categorybanner_form_banner_form"}
+
+{capture "banner_form_creation_dialog"}
+    {form_hidden_fields}
+
+    {render_form_field field='success_url' value="{url path='/admin/module/CategoryBanner'}"}
+    {render_form_field field='title'}
+    {render_form_field field='description'}
+    {render_form_field field='url'}
+    {render_form_field field='button_label'}
+    {render_form_field field='image_file'}
+
+{/capture}
+
+
+    {include
+    file = "includes/generic-create-dialog.html"
+
+    dialog_id    = "banner_creation_dialog"
+    dialog_title = {intl l="Add a new banner"}
+    dialog_body  = {$smarty.capture.banner_form_creation_dialog nofilter}
+
+    dialog_ok_label     = {intl l="Create"}
+    dialog_cancel_label = {intl l="Cancel"}
+
+    form_action        = {url path='/admin/module/CategoryBanner/banner/create'}
+    form_enctype       = {form_enctype}
+    form_error_message = $form_error_message
+    }
+
+{/form}
+
+{capture "banner_delete_dialog"}
+    <input type="hidden" name="banner_id" id="banner_delete_id" value="" />
+{/capture}
+
+{include
+file = "includes/generic-confirm-dialog.html"
+
+dialog_id       = "banner_delete_dialog"
+dialog_title    = {intl l="Delete banner"}
+dialog_message  = {intl l="Do you really want to delete this banner ?"}
+
+form_action         = {token_url path='/admin/module/CategoryBanner/banner/delete'}
+form_content        = {$smarty.capture.banner_delete_dialog nofilter}
+}
+

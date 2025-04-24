@@ -1,0 +1,64 @@
+{default_translation_domain domain='categorybanner.bo.default'}
+{extends file="admin-layout.tpl"}
+
+{block name="page-title"}{intl l='Edit banner'}{/block}
+
+{block name="main-content"}
+
+    <div id="wrapper" class="container">
+        <ul class="breadcrumb">
+            <li><a href="{url path='/admin'}">{intl l="Home" d="hooknavigation.bo.default"}</a></li>
+            <li><a href="{url path='/admin/modules'}">{intl l="Modules" d="hooknavigation.bo.default"}</a></li>
+            <li><a href="{url path='/admin/module/CategoryBanner'}">{intl l="Banner list"}</a></li>
+            <li>{intl l="Edit banner"}</li>
+        </ul>
+        {loop name="banner_list" type="banner_loop" width="580" lang_id=$edit_language_id|default:null id=$bannerId}
+            <div class="col-md-12 general-block-decorator">
+                {form name="categorybanner_form_banner_form"}
+                    <form action="{url path="/admin/module/CategoryBanner/banner/{$bannerId}"}" method="post" enctype="multipart/form-data">
+                        <div class="tab-pane">
+                            <div class="form-container">
+                                {include
+                                file = "includes/inner-form-toolbar.html"
+                                hide_save_and_close_button = true
+                                page_url = {url path=$smarty.server.REQUEST_URI}
+                                close_url = {url path="/admin/module/CategoryBanner"}
+                                }
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="control-label">{intl l="Preview"} : </label>
+                                <p>
+                                    {if $PROCESSING_ERROR}
+                                        <img src="//placehold.it/580x580&text={intl l='Image+file+not+found'}" alt="{$TITLE}" class="img-thumbnail">
+                                    {else}
+                                        <img src="{$IMAGE_URL nofilter}" alt="{$TITLE}" class="img-thumbnail">
+                                    {/if}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 form-container">
+
+                            {form_hidden_fields}
+
+                            {render_form_field field='success_url' value={url path=$smarty.server.REQUEST_URI}}
+
+                            {render_form_field field='title' value=$TITLE}
+
+                            {render_form_field field='description' value=$DESCRIPTION}
+
+                            {render_form_field field='url' value=$URL}
+
+                            {render_form_field field='button_label' value=$BUTTON_LABEL}
+
+                            {render_form_field field='image_file'}
+                        </div>
+                    </form>
+                {/form}
+            </div>
+        {/loop}
+    </div>
+{/block}

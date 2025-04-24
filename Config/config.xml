@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<config xmlns="http://thelia.net/schema/dic/config"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://thelia.net/schema/dic/config http://thelia.net/schema/dic/config/thelia-1.0.xsd">
+
+    <loops>
+        <!-- sample definition
+        <loop name="MySuperLoop" class="CategoryBanner\Loop\MySuperLoop" />
+        -->
+    </loops>
+
+    <forms>
+        <!--
+        <form name="MyFormName" class="CategoryBanner\Form\MySuperForm" />
+        -->
+    </forms>
+
+    <commands>
+        <!--
+        <command class="CategoryBanner\Command\MySuperCommand" />
+        -->
+    </commands>
+
+    <!--
+    <services>
+
+    </services>
+    -->
+
+
+    <hooks>
+        <hook id="categorybanner.hook" class="CategoryBanner\Hook\BackHook">
+            <tag name="hook.event_listener" event="main.in-top-menu-items" type="back" method="onMainTopMenuItems" />
+            <tag name="hook.event_listener" event="module.configuration" type="back" method="onModuleConfiguration" />
+            <tag name="hook.event_listener" event="module.config-js" type="back" method="onModuleConfigurationJs" />
+            <tag name="hook.event_listener" event="category.tab" type="back" method="onCategoryTab" />
+            <tag name="hook.event_listener" event="category.edit-js" type="back" method="onCategoryEditJs" />
+        </hook>
+    </hooks>
+
+
+    <!--
+    <exports>
+
+    </exports>
+    -->
+
+    <!--
+    <imports>
+
+    </imports>
+    -->
+</config>
