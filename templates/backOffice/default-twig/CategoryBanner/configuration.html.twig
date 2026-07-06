@@ -1,0 +1,94 @@
+{# CategoryBanner module configuration (hook module.configuration, default-twig BO).
+   Banner list + create/delete. Data is provided by CategoryBanner\Hook\BackHook.
+   Uses the theme UI components: BoDataTable (+ column_actions/row_action), BoCreateDialog, BoConfirmDialog. #}
+{% set d = 'categorybanner.bo.default' %}
+{% set form = getForm('categorybanner_form_banner_form') %}
+
+<div class="modules-configure" id="module-CategoryBanner-config">
+    <div class="card mb-3">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h2 class="card-title h4 mb-0">{{ 'Category banners'|trans({}, d) }}</h2>
+            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#banner-create-modal">
+                <i class="bi bi-plus-lg" aria-hidden="true"></i> {{ 'Add a new banner'|trans({}, d) }}
+            </button>
+        </div>
+        <div class="card-body">
+            {% set banner_rows = [] %}
+            {% for banner in banners %}
+                {% set edit_url = path('categorybanner_banner_get_banner_page', {id: banner.id}) %}
+                {% set image_html %}
+                    {% if not banner.processing_error and banner.image_url %}
+                        <img class="img-thumbnail" src="{{ banner.image_url }}" alt="{{ banner.title }}" style="max-height:50px">
+                    {% else %}
+                        <span class="text-muted"><i class="bi bi-image"></i></span>
+                    {% endif %}
+                {% endset %}
+                {% set banner_rows = banner_rows|merge([{
+                    'id':      banner.id,
+                    'image':   image_html,
+                    'title':   '<a href="' ~ edit_url ~ '">' ~ banner.title|e ~ '</a>',
+                    '_actions': [
+                        row_action('edit', 'Edit this banner'|trans({}, d), href: edit_url),
+                        row_action('delete', 'Delete this banner'|trans({}, d), modalTarget: '#banner-delete-modal', dataAttributes: {'data-banner-id': banner.id}),
+                    ],
+                }]) %}
+            {% endfor %}
+
+            {{ component('BoDataTable', {
+                id: 'categorybanner-list',
+                columns: [
+                    column_text('id',      'ID'|trans({}, d),      'start'),
+                    column_html('image',   ''),
+                    column_html('title',   'Title'|trans({}, d)),
+                    column_actions('_actions', 'Actions'|trans({}, d)),
+                ],
+                rows: banner_rows,
+                emptyMessage: 'There is no banner. Click the button above to create one.'|trans({}, d),
+            }) }}
+        </div>
+    </div>
+
+    {# ---- Create banner modal (BoCreateDialog) ---- #}
+    {% component 'BoCreateDialog' with {
+        id: 'banner-create-modal',
+        title: 'Add a new banner'|trans({}, d),
+        form: form,
+        formAction: path('categorybanner_banner_create'),
+        submitLabel: 'Create'|trans({}, d),
+        size: '',
+    } %}
+        {% block fields %}
+            {{ form_widget(form.success_url, {value: '/admin/module/CategoryBanner'}) }}
+            <div class="mb-3">
+                <label class="form-label" for="{{ form.title.vars.id }}">{{ 'Title'|trans({}, d) }}</label>
+                {{ form_widget(form.title, {attr: {class: 'form-control'}}) }}
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="{{ form.description.vars.id }}">{{ 'Description'|trans({}, d) }}</label>
+                {{ form_widget(form.description, {attr: {class: 'form-control'}}) }}
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="{{ form.url.vars.id }}">{{ 'URL'|trans({}, d) }}</label>
+                {{ form_widget(form.url, {attr: {class: 'form-control'}}) }}
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="{{ form.button_label.vars.id }}">{{ 'Button label'|trans({}, d) }}</label>
+                {{ form_widget(form.button_label, {attr: {class: 'form-control'}}) }}
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="{{ form.image_file.vars.id }}">{{ 'Image'|trans({}, d) }}</label>
+                {{ form_widget(form.image_file, {attr: {class: 'form-control'}}) }}
+            </div>
+        {% endblock %}
+    {% endcomponent %}
+
+    {# ---- Delete banner modal (BoConfirmDialog, id prefilled via bo-prefill-modal) ---- #}
+    {{ component('BoConfirmDialog', {
+        id: 'banner-delete-modal',
+        title: 'Delete banner'|trans({}, d),
+        formAction: path('categorybanner_banner_delete'),
+        message: 'Do you really want to delete this banner?'|trans({}, d),
+        prefillTrigger: 'data-banner-id',
+        prefillInput: 'banner_id',
+    }) }}
+</div>

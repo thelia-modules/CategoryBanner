@@ -29,15 +29,7 @@
     -->
 
 
-    <hooks>
-        <hook id="categorybanner.hook" class="CategoryBanner\Hook\BackHook">
-            <tag name="hook.event_listener" event="main.in-top-menu-items" type="back" method="onMainTopMenuItems" />
-            <tag name="hook.event_listener" event="module.configuration" type="back" method="onModuleConfiguration" />
-            <tag name="hook.event_listener" event="module.config-js" type="back" method="onModuleConfigurationJs" />
-            <tag name="hook.event_listener" event="category.tab" type="back" method="onCategoryTab" />
-            <tag name="hook.event_listener" event="category.edit-js" type="back" method="onCategoryEditJs" />
-        </hook>
-    </hooks>
+    <!-- Hooks are auto-discovered in Thelia 3 via CategoryBanner\Hook\BackHook::getSubscribedHooks(). -->
 
 
     <!--

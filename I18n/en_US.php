@@ -11,5 +11,6 @@
  */
 
 return [
-    // 'an english string' => 'The displayed english string',
+    'Banner' => 'Banner',
+    'Manage banners' => 'Manage banners',
 ];

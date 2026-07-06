@@ -4,15 +4,12 @@
         xsi:schemaLocation="http://thelia.net/schema/dic/module http://thelia.net/schema/dic/module/module-2_2.xsd">
     <fullnamespace>CategoryBanner\CategoryBanner</fullnamespace>
     <descriptive locale="en_US">
-        <title>Automatically generated module - please update module.xml file</title>
-        <!--
-        <subtitle></subtitle>
-        <description></description>
-        <postscriptum></postscriptum>
-        -->
+        <title>Category Banner</title>
+        <description>Add banners to category pages, managed from the back office.</description>
     </descriptive>
     <descriptive locale="fr_FR">
-        <title>Module généré automatiquement - éditez le fichier module.xml</title>
+        <title>Bannières de catégorie</title>
+        <description>Ajoute des bannières sur les pages de catégorie, gérées depuis le back-office.</description>
     </descriptive>
     <!-- <logo></logo> -->
     <!--<images-folder>images</images-folder>-->
@@ -20,7 +17,7 @@
         <language>en_US</language>
         <language>fr_FR</language>
     </languages>
-    <version>0.5.0</version>
+    <version>0.6.0</version>
     <authors>
         <author>
             <name></name>
@@ -36,7 +33,7 @@
         <module version="&gt;0.2">HookSearch</module>
     </required>
     -->
-    <thelia>2.5.0</thelia>
+    <thelia>2.6.0</thelia>
     <stability>other</stability>
     <mandatory>0</mandatory>
     <hidden>0</hidden>

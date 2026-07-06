@@ -11,5 +11,6 @@
  */
 
 return [
-    // 'an english string' => 'La traduction française de la chaine',
+    'Banner' => 'Bannière',
+    'Manage banners' => 'Gérer les bannières',
 ];

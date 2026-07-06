@@ -6,21 +6,27 @@ use CategoryBanner\CategoryBanner;
 use CategoryBanner\Form\BannerForm;
 use CategoryBanner\Model\Banner;
 use CategoryBanner\Model\BannerQuery;
+use CategoryBanner\Service\BannerDataService;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Thelia\Controller\Admin\BaseAdminController;
 use Thelia\Core\Template\ParserContext;
-use Thelia\Files\FileManager;
+use Thelia\Core\File\FileManager;
 use Thelia\Model\Base\LangQuery;
 use Symfony\Component\Routing\Annotation\Route;
 use Thelia\Tools\URL;
-use Twig\Parser;
+use Twig\Environment;
 
 
 #[Route('/admin/module/CategoryBanner/banner', name: 'categorybanner_banner_')]
 class BannerConfigController extends BaseAdminController
 {
+    public function __construct(private readonly Environment $twig)
+    {
+    }
+
     #[Route('/create', name: 'create', methods: 'POST')]
     public function createBanner(ParserContext $parserContext, FileManager $fileManager)
     {
@@ -70,16 +76,21 @@ class BannerConfigController extends BaseAdminController
     }
 
     #[Route('/{id}', name: 'get_banner_page', methods: 'GET')]
-    public function renderBannerEditPage(Request $request, $id)
+    public function renderBannerEditPage(Request $request, $id, BannerDataService $bannerDataService)
     {
         if (!$langId = $request->get('edit_language_id')){
             $langId = LangQuery::create()->filterByByDefault(1)->findOne()?->getId();
         }
 
-        return $this->render('edit-banner', [
-            'bannerId' => $id,
-            'edit_language_id' => $langId,
-        ], 200);
+        $locale = LangQuery::create()->findPk($langId)?->getLocale() ?? 'en_US';
+
+        return new Response(
+            $this->twig->render('@CategoryBannerModule/backOffice/default-twig/CategoryBanner/edit-banner.html.twig', [
+                'bannerId' => (int) $id,
+                'edit_language_id' => (int) $langId,
+                'banner' => $bannerDataService->getBanner((int) $id, $locale, 580),
+            ])
+        );
     }
 
     #[Route('/{id}', name: 'update_banner', methods: 'POST')]

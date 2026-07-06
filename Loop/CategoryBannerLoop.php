@@ -21,7 +21,7 @@ use Thelia\Type\TypeCollection;
 
 class CategoryBannerLoop extends BaseLoop implements PropelSearchLoopInterface
 {
-    protected function getArgDefinitions()
+    protected function getArgDefinitions(): ArgumentCollection
     {
         return new ArgumentCollection(
             Argument::createAlphaNumStringTypeArgument('category_banner_id'),
@@ -59,7 +59,7 @@ class CategoryBannerLoop extends BaseLoop implements PropelSearchLoopInterface
         return $query;
     }
 
-    public function parseResults(LoopResult $loopResult)
+    public function parseResults(LoopResult $loopResult): LoopResult
     {
         $lang = $this->getCurrentRequest()->getSession()->get('thelia.current.lang');
 
