@@ -1,0 +1,73 @@
+{# Banner edit page (rendered by CategoryBanner\Controller\BannerConfigController, default-twig BO). #}
+{% extends '@BackOfficeDefaultTwig/base.html.twig' %}
+{% set d = 'categorybanner.bo.default' %}
+{% set form = getForm('categorybanner_form_banner_form') %}
+
+{% block title %}{{ 'Edit banner'|trans({}, d) }}{% endblock %}
+
+{% block breadcrumb %}
+    <nav aria-label="breadcrumb" class="mb-1">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{{ path('admin.home') }}">{{ 'Home'|trans({}, d) }}</a></li>
+            <li class="breadcrumb-item"><a href="/admin/modules">{{ 'Modules'|trans({}, d) }}</a></li>
+            <li class="breadcrumb-item"><a href="/admin/module/CategoryBanner">{{ 'Banner list'|trans({}, d) }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ 'Edit banner'|trans({}, d) }}</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h1 class="h4 mb-0">{{ 'Edit banner'|trans({}, d) }}</h1>
+            {{ component('BoLanguageSwitcher', {currentLanguageId: edit_language_id}) }}
+        </div>
+        <div class="card-body">
+            <form action="{{ path('categorybanner_banner_update_banner', {id: bannerId}) }}" method="post" enctype="multipart/form-data" class="row">
+                {{ form_widget(form._token) }}
+                <input type="hidden" name="{{ field_name(form.success_url) }}" value="{{ path('categorybanner_banner_get_banner_page', {id: bannerId, edit_language_id: edit_language_id}) }}">
+                <input type="hidden" name="edit_language_id" value="{{ edit_language_id }}">
+
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">{{ 'Preview'|trans({}, d) }}</label>
+                    <div>
+                        {% if banner is null or banner.processing_error or not banner.image_url %}
+                            <img src="//placehold.co/580x300?text={{ 'Image+file+not+found'|trans({}, d)|url_encode }}" alt="" class="img-thumbnail">
+                        {% else %}
+                            <img src="{{ banner.image_url }}" alt="{{ banner.title }}" class="img-thumbnail">
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label" for="{{ form.title.vars.id }}">{{ 'Title'|trans({}, d) }}</label>
+                        {{ form_widget(form.title, {value: banner.title|default(''), attr: {class: 'form-control'}}) }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="{{ form.description.vars.id }}">{{ 'Description'|trans({}, d) }}</label>
+                        {{ form_widget(form.description, {value: banner.description|default(''), attr: {class: 'form-control'}}) }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="{{ form.url.vars.id }}">{{ 'URL'|trans({}, d) }}</label>
+                        {{ form_widget(form.url, {value: banner.url|default(''), attr: {class: 'form-control'}}) }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="{{ form.button_label.vars.id }}">{{ 'Button label'|trans({}, d) }}</label>
+                        {{ form_widget(form.button_label, {value: banner.button_label|default(''), attr: {class: 'form-control'}}) }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="{{ form.image_file.vars.id }}">{{ 'Image'|trans({}, d) }}</label>
+                        {{ form_widget(form.image_file, {attr: {class: 'form-control'}}) }}
+                    </div>
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="/admin/module/CategoryBanner" class="btn btn-outline-secondary">{{ 'Cancel'|trans({}, d) }}</a>
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-check2" aria-hidden="true"></i> {{ 'Save'|trans({}, d) }}</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

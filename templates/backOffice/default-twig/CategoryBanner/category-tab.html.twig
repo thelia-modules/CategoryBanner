@@ -1,0 +1,200 @@
+{# Category banners tab (hook category.tab, default-twig BO).
+   Replaces the Smarty category-tab.html + category-tab-js.html. Data comes from
+   CategoryBanner\Hook\BackHook; the row editing is AJAX against the JSON controller. #}
+{% set d = 'categorybanner.bo.default' %}
+
+<div class="slices form-container"
+     id="category-banner-tab-{{ category_id }}"
+     data-category-id="{{ category_id }}"
+     data-save-url="{{ path('categorybanner_category_save') }}"
+     data-delete-url="{{ path('categorybanner_category_delete') }}">
+
+    <div class="alert alert-danger d-none js-slice-error" role="alert"></div>
+
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>{{ 'Banner'|trans({}, d) }}</th>
+                    <th>{{ 'Position'|trans({}, d) }}</th>
+                    <th>{{ 'Size'|trans({}, d) }}</th>
+                    <th class="text-end">{{ 'Actions'|trans({}, d) }}</th>
+                </tr>
+            </thead>
+            <tbody class="js-slices-body">
+                {% for cb in category_banners %}
+                    <tr class="js-slice" data-id="{{ cb.id }}">
+                        <td>
+                            <select class="form-select js-slice-banner">
+                                <option value="">-- {{ 'Select a banner'|trans({}, d) }} --</option>
+                                {% for b in banners %}
+                                    <option value="{{ b.id }}"{% if cb.banner_id == b.id %} selected{% endif %}>{{ b.id }}-{{ b.title }}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td><input type="number" class="form-control js-slice-position" value="{{ cb.position }}"></td>
+                        <td>
+                            <select class="form-select js-slice-size">
+                                <option value="1"{% if cb.size == 1 %} selected{% endif %}>1</option>
+                                <option value="2"{% if cb.size == 2 %} selected{% endif %}>2</option>
+                            </select>
+                        </td>
+                        <td class="text-end text-nowrap">
+                            <button type="button" class="btn btn-outline-primary btn-sm js-slice-save" title="{{ 'Save this banner'|trans({}, d) }}">
+                                <i class="bi bi-save" aria-hidden="true"></i>
+                            </button>
+                            <button type="button" class="btn btn-outline-danger btn-sm js-slice-delete" title="{{ 'Delete this banner'|trans({}, d) }}">
+                                <i class="bi bi-trash" aria-hidden="true"></i>
+                            </button>
+                        </td>
+                    </tr>
+                {% endfor %}
+
+                <tr class="js-slice-new" data-id="0">
+                    <td>
+                        <select class="form-select js-slice-banner">
+                            <option value="">-- {{ 'Select a banner'|trans({}, d) }} --</option>
+                            {% for b in banners %}
+                                <option value="{{ b.id }}">{{ b.id }}-{{ b.title }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td><input type="number" class="form-control js-slice-position" value=""></td>
+                    <td>
+                        <select class="form-select js-slice-size">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                        </select>
+                    </td>
+                    <td class="text-end">
+                        <button type="button" class="btn btn-outline-success btn-sm js-slice-add" title="{{ 'Add this banner'|trans({}, d) }}">
+                            <i class="bi bi-plus-lg" aria-hidden="true"></i>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    {# Row cloned by JS when a new association is created. #}
+    <template class="js-slice-template">
+        <tr class="js-slice" data-id="">
+            <td>
+                <select class="form-select js-slice-banner">
+                    <option value="">-- {{ 'Select a banner'|trans({}, d) }} --</option>
+                    {% for b in banners %}
+                        <option value="{{ b.id }}">{{ b.id }}-{{ b.title }}</option>
+                    {% endfor %}
+                </select>
+            </td>
+            <td><input type="number" class="form-control js-slice-position" value=""></td>
+            <td>
+                <select class="form-select js-slice-size">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                </select>
+            </td>
+            <td class="text-end text-nowrap">
+                <button type="button" class="btn btn-outline-primary btn-sm js-slice-save" title="{{ 'Save this banner'|trans({}, d) }}">
+                    <i class="bi bi-save" aria-hidden="true"></i>
+                </button>
+                <button type="button" class="btn btn-outline-danger btn-sm js-slice-delete" title="{{ 'Delete this banner'|trans({}, d) }}">
+                    <i class="bi bi-trash" aria-hidden="true"></i>
+                </button>
+            </td>
+        </tr>
+    </template>
+</div>
+
+<script>
+(function () {
+    "use strict";
+    var root = document.getElementById('category-banner-tab-{{ category_id }}');
+    if (!root || root.dataset.categorybannerBound === '1') { return; }
+    root.dataset.categorybannerBound = '1';
+
+    var cfg = root.dataset;
+    var body = root.querySelector('.js-slices-body');
+    var template = root.querySelector('.js-slice-template');
+    var errorBox = root.querySelector('.js-slice-error');
+
+    function showError(message) {
+        errorBox.innerHTML = message;
+        errorBox.classList.remove('d-none');
+    }
+
+    function hideError() {
+        errorBox.classList.add('d-none');
+    }
+
+    function sliceData(row) {
+        return {
+            id: row.dataset.id,
+            banner: row.querySelector('.js-slice-banner').value,
+            position: row.querySelector('.js-slice-position').value,
+            size: row.querySelector('.js-slice-size').value,
+            category: cfg.categoryId
+        };
+    }
+
+    function post(url, data) {
+        return fetch(url, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-Requested-With': 'XMLHttpRequest' },
+            body: new URLSearchParams(data).toString()
+        }).then(function (response) { return response.json(); });
+    }
+
+    root.addEventListener('click', function (event) {
+        var addBtn = event.target.closest('.js-slice-add');
+        if (addBtn) {
+            hideError();
+            var newRow = addBtn.closest('tr');
+            post(cfg.saveUrl, sliceData(newRow)).then(function (data) {
+                if (!data.success) { showError([].concat(data.message).join('<br>')); return; }
+                var clone = template.content.firstElementChild.cloneNode(true);
+                clone.dataset.id = data.banner.id;
+                clone.querySelector('.js-slice-banner').value = data.banner.bannerId;
+                clone.querySelector('.js-slice-position').value = data.banner.position;
+                clone.querySelector('.js-slice-size').value = data.banner.size;
+                body.insertBefore(clone, newRow);
+                newRow.querySelectorAll('input, select').forEach(function (el) { el.value = ''; });
+            }).catch(function () { showError('An error occurred.'); });
+            return;
+        }
+
+        var saveBtn = event.target.closest('.js-slice-save');
+        if (saveBtn) {
+            hideError();
+            var savedRow = saveBtn.closest('tr');
+            post(cfg.saveUrl, sliceData(savedRow)).then(function (data) {
+                if (!data.success) { showError([].concat(data.message).join('<br>')); return; }
+                saveBtn.classList.remove('btn-outline-primary');
+                saveBtn.classList.add('btn-outline-success');
+            }).catch(function () { showError('An error occurred.'); });
+            return;
+        }
+
+        var deleteBtn = event.target.closest('.js-slice-delete');
+        if (deleteBtn) {
+            hideError();
+            var deletedRow = deleteBtn.closest('tr');
+            post(cfg.deleteUrl, sliceData(deletedRow)).then(function (data) {
+                if (!data.success) { showError([].concat(data.message).join('<br>')); return; }
+                deletedRow.remove();
+            }).catch(function () { showError('An error occurred.'); });
+        }
+    });
+
+    root.addEventListener('change', function (event) {
+        var row = event.target.closest('.js-slice');
+        if (!row) { return; }
+        var saveBtn = row.querySelector('.js-slice-save');
+        if (saveBtn) {
+            saveBtn.classList.remove('btn-outline-primary');
+            saveBtn.classList.add('btn-outline-warning');
+        }
+    });
+}());
+</script>
